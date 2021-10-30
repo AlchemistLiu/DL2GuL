@@ -52,11 +52,25 @@ def cut(p_path, w=28, h=28):
     plt.imsave(p_path, in_put)
     return in_put/255
 
-in_put = cut(r'myDLstudy\picture\T1.jpeg')
-out_put = clone_net(in_put)
-print(out_put)
+def cut2Alx(p_path, w=224, h=224):
+    img = Image.open(p_path)
+    resize_img = img.resize((w, h), Image.ANTIALIAS)
 
-print(out_put.argmax())
+    resize_img.save(p_path)
+    img = plt.imread(p_path)
+    img = rgb2gray(img)
+    in_put = torch.tensor(img, dtype=torch.float32)
+    plt.imsave(p_path, in_put)
+    in_put = in_put.reshape((1, 1, 224, 224))
+    return in_put/255
+
+in_put = cut(r'myDLstudy\picture\T4.jpeg')
+out_put = clone_net(in_put)
+preds = d2l.get_fashion_mnist_labels(out_put.argmax(axis=1))
+print(preds)
+# print(out_put)
+
+# print(out_put.argmax())
 '''
 text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                 'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
