@@ -32,6 +32,26 @@ for layer in net:
     X = layer(X)
     print(layer.__class__.__name__,'output shape:\t', X.shape)
 
+'''
+Sequential output shape: torch.Size([1, 96, 54, 54])
+MaxPool2d output shape:  torch.Size([1, 96, 26, 26])
+Sequential output shape: torch.Size([1, 256, 26, 26])
+MaxPool2d output shape:  torch.Size([1, 256, 12, 12])
+Sequential output shape: torch.Size([1, 384, 12, 12])
+MaxPool2d output shape:  torch.Size([1, 384, 5, 5])
+Sequential output shape: torch.Size([1, 256, 5, 5])
+Flatten output shape:    torch.Size([1, 256])
+Sequential output shape: torch.Size([1, 96, 54, 54])
+Sequential output shape: torch.Size([1, 256, 26, 26])
+MaxPool2d output shape:  torch.Size([1, 256, 12, 12])
+Sequential output shape: torch.Size([1, 384, 12, 12])
+MaxPool2d output shape:  torch.Size([1, 384, 5, 5])
+Dropout output shape:    torch.Size([1, 384, 5, 5])
+Sequential output shape: torch.Size([1, 10, 5, 5])
+AdaptiveAvgPool2d output shape:  torch.Size([1, 10, 1, 1])
+Flatten output shape:    torch.Size([1, 10])
+'''
+
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
