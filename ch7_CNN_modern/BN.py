@@ -68,7 +68,7 @@ net = nn.Sequential(
     nn.Conv2d(1, 6, kernel_size=5), BatchNorm(6, num_dims=4),
     nn.Sigmoid(), nn.MaxPool2d(kernel_size=2, stride=2),
     nn.Conv2d(6, 16, kernel_size=5), BatchNorm(16, num_dims=4),
-    nn.Sigmoid(), nn.MaxPool2d(kernel_size=2, stride=2), 
+    nn.Sigmoid(), nn.MaxPool2d(kernel_size=2, stride=2),   
     nn.Flatten(),
     nn.Linear(16* 4 * 4, 120),
     BatchNorm(120, num_dims=2), nn.Sigmoid(),
