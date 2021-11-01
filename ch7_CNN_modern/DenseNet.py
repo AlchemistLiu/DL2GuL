@@ -67,6 +67,7 @@ b1 = nn.Sequential( nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
 
 # `num_channels`为当前的通道数
 num_channels, growth_rate = 64, 32
+# 16个denseblock
 num_convs_in_dense_blocks = [4, 4, 4, 4]
 blks = []
 for i, num_convs in enumerate(num_convs_in_dense_blocks):
