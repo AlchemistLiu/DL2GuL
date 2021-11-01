@@ -75,17 +75,18 @@ net = nn.Sequential(
     nn.Linear(120, 84), BatchNorm(84, num_dims=2),nn.Sigmoid(),
     nn.Linear(84, 10))
 
-# 训练
-lr, num_epochs, batch_size = 1.0, 10, 256
-train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
+
+# # 训练
+# lr, num_epochs, batch_size = 1.0, 10, 256
+# train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+# d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 
 
-plt.show()
-result_gamma = net[1].gamma.reshape((-1, ))
-result_beta = net[1].beta.reshape((-1, ))
-print(result_gamma)
-print(result_beta)
+# plt.show()
+# result_gamma = net[1].gamma.reshape((-1, ))
+# result_beta = net[1].beta.reshape((-1, ))
+# print(result_gamma)
+# print(result_beta)
 '''
 tensor([1.6561, 2.5334, 1.4988, 1.0204, 2.2207, 2.2839],
        grad_fn=<ViewBackward>)
