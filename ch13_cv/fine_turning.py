@@ -6,7 +6,6 @@ from torch import nn
 from d2l import torch as d2l
 from matplotlib import pyplot as plt
 from torchvision import transforms
-from torchvision.transforms.transforms import RandomHorizontalFlip
 
 # 热狗识别
 d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL + 'hotdog.zip',
