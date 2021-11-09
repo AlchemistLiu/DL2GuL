@@ -208,6 +208,7 @@ def assign_anchor_to_bbox(ground_truth, anchors, device, iou_threshold=0.5):
     return anchors_bbox_map
 
 # 标记类和偏移
+# 麻了，以后需要再看吧
 def offset_boxes(anchors, assigned_bb, eps=1e-6):
     # 转换锚框的偏移量
     c_anc = d2l.box_corner_to_center(anchors)
@@ -216,3 +217,4 @@ def offset_boxes(anchors, assigned_bb, eps=1e-6):
     offset_wh = 5 * torch.log(eps + c_assigned_bb[:, 2:] / c_anc[:, 2:])
     offset = torch.cat([offset_xy, offset_wh], axis=1)
     return offset
+
