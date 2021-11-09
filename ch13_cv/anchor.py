@@ -1,7 +1,12 @@
 # 锚框
 import torch
 from d2l import torch as d2l
+from matplotlib import pyplot as plt
 
+'''
+这节所有的锚框坐标都做了归一化
+'''
+torch.set_printoptions(2)  # 精简打印精度
 
 '''
 想钓鱼一样，广撒网(生成一堆锚框),当锚框碰到真实的边界框时，保留，删除其他锚框
@@ -59,8 +64,8 @@ def multibox_prior(data, sizes, ratios):
     # 一个精巧绝伦的(num_size + num_ratios - 1)个数据的生成
     # 直接看了我一下午 湿了！
     w = torch.cat((size_tensor * torch.sqrt(ratio_tensor[0]),
-                  sizes[0] * torch.sqrt(ratio_tensor[1:])))
-                   # * in_height / in_width # 这里应该是对矩形图片的处理，我也不知道为啥
+                  sizes[0] * torch.sqrt(ratio_tensor[1:])))\
+                  * in_height / in_width # 这里应该是对矩形图片的处理，我也不知道为啥
                    # 注释掉有时候也能跑，先注释掉，等出问题了再说
     h = torch.cat((size_tensor / torch.sqrt(ratio_tensor[0]),
                   sizes[0] / torch.sqrt(ratio_tensor[1:])))
@@ -74,6 +79,98 @@ def multibox_prior(data, sizes, ratios):
     output = out_grid + anchor_manipulations
     return output.unsqueeze(0) # 增加维度
 
-# img = d2l.plt.imread('pytorch\img\catdog.jpg')
-# h, w = img.shape[:2]
-# print(h, w)
+img = d2l.plt.imread('pytorch\img\catdog.jpg')
+h, w = img.shape[:2]
+print(h, w)
+X = torch.rand(size=(1, 3, h, w))
+Y = multibox_prior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
+print(Y.shape)
+
+# 5-->(3+3-1)
+boxes = Y.reshape(h, w, 5, 4)
+# 看250为中心的那个锚框
+print(boxes[250, 250, 0, :])
+
+# 画一下
+def show_bboxes(axes, bboxs, labels=None, colors=None):
+    '''看一眼'''
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxs):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(bbox.detach().numpy(), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+            
+d2l.set_figsize()
+bbox_scale = torch.tensor((w, h, w, h))
+fig = d2l.plt.imshow(img)
+show_bboxes(fig.axes, boxes[400, 250, :, :] * bbox_scale,
+            ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
+             's=0.75, r=0.5'])
+plt.show()
+
+# 交并比IoU
+def box_iou(boxes1, boxes2):
+    # 计算交并比
+    # boxes[:, 2] 取所有行的第三列 h
+    # boxes(x1, y1, x2, y2)
+    box_area = lambda boxes: ((boxes[:, 2] - boxes[:, 0]) *
+                              (boxes[:, 3] - boxes[:, 1]))
+    # `boxes1`, `boxes2`, `areas1`, `areas2`的形状: 
+    # `boxes1`：(boxes1的数量, 4),
+    # `boxes2`：(boxes2的数量, 4), 
+    # `areas1`：(boxes1的数量,), 
+    # `areas2`：(boxes2的数量,)
+    '''boxes1/boxes2的面积'''
+    areas1 = box_area(boxes1)
+    areas2 = box_area(boxes2)
+    #  inter_upperlefts, inter_lowerrights, inters的形状: 
+    # 左上右下
+    # (boxes1的数量, boxes2的数量, 2)
+    # boxes1[:, None, :2]好像增加了一维
+    # boxes1应该是随机生成的锚框， boxes2是手动标记的正确锚框
+    '''
+    boxes1, boxes2
+    tensor([[0.00, 0.10, 0.20, 0.30],
+            [0.15, 0.20, 0.40, 0.40],
+            [0.63, 0.05, 0.88, 0.98],
+            [0.66, 0.45, 0.80, 0.80],
+            [0.57, 0.30, 0.92, 0.90]]) 
+    tensor([[0.10, 0.08, 0.52, 0.92],
+            [0.55, 0.20, 0.90, 0.88]])
+    boxes1[:, None, :2], boxes2[:, :2]
+    tensor([[[0.00, 0.10]],
+
+            [[0.15, 0.20]],
+
+            [[0.63, 0.05]],
+
+            [[0.66, 0.45]],
+
+            [[0.57, 0.30]]]) 
+    torch.Size([5, 1, 2])
+    tensor([[0.10, 0.08],
+            [0.55, 0.20]])
+    torch.Size([2, 2])
+    '''
+    # 取重叠部分的左上角，max()取出总是偏右, 取出的每个位置对应最大/最小的元素
+    # None在这里在矩阵中间加了一维，数值为1
+    inter_upperlefts = torch.max(boxes1[:, None, :2], boxes2[:, :2])
+    inter_lowerrights = torch.min(boxes1[:, None, :2], boxes2[:, :2])
+    # clamp(min=0)限制值非负
+    inters = (inter_lowerrights - inter_upperlefts).clamp(min=0)
+    # `inter_areas` and `union_areas`的形状: (boxes1的数量, boxes2的数量)
+    inter_areas = inters[:, :, 0] * inters[:, :, 1]
+    union_areas = areas1[:,None] + areas2 - inter_areas
+    return inter_areas / union_areas
