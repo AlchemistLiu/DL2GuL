@@ -72,3 +72,16 @@ def down_sample_blk(in_channels, out_channels):
 
 # print(forward(torch.zeros((2, 3, 20, 20)), down_sample_blk(3, 10)).shape)
 # torch.Size([2, 10, 10, 10])
+
+# 基本网络块
+# 从原始图片抽特征,一直到第一次对fmap做锚框的中间那一节
+# 包含三个down_sample_blk
+def base_net():
+    blk = []
+    num_filters = [3, 16, 32, 64]
+    for i in range(len(num_filters) - 1):
+        blk.append(down_sample_blk(num_filters[i], num_filters[i + 1]))
+    return nn.Sequential(*blk)
+
+# print(forward(torch.zeros((2, 3, 256, 256)), base_net()).shape)
+# torch.Size([2, 64, 32, 32])

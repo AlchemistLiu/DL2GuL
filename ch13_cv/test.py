@@ -11,3 +11,4 @@ from d2l import torch as d2l
 
 img = d2l.plt.imread('pytorch\img\catdog.jpg')        
 print(d2l.plt.imshow(img).axes)                  
+# AxesSubplot(0.125,0.11;0.775x0.77)
