@@ -66,6 +66,8 @@ def cut2Alx(p_path, w=224, h=224):
 
 in_put = cut(r'myDLstudy\picture\T4.jpeg')
 out_put = clone_net(in_put)
+
+out_put = clone_net(in_put)
 preds = d2l.get_fashion_mnist_labels(out_put.argmax(axis=1))
 print(preds)
 # print(out_put)
