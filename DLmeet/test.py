@@ -18,7 +18,7 @@ import numpy as np
 # img = Image.fromarray(img)
 # img = img.convert('L')
 # img.save(r'myDLstudy\DLmeet\test.jpg')
-a = np.array([[1, 2, 3], 
-              [4, 5, 6]])
-b = np.array([[2, 3, 4], [5, 6, 7]])
-print(a[:, 1:2])
+# a = np.array([[1, 2, 3], 
+#               [4, 5, 6]])
+# b = np.array([[2, 3, 4], [5, 6, 7]])
+# print(a[:, 2])
