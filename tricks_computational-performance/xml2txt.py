@@ -31,13 +31,16 @@ def get_singlefile(path):
         # 3883 949 4957 2064 tamper
     return (xmin, ymin, xmax, ymax, cls_name)
 
-# print(get_singlefile(r'myDLstudy\tricks_computational-performance\000001.xml'))
+
+# print(get_singlefile(r'F:\dataset\syn\Annotations\000001.xml'))
 # ('3883', '949', '4957', '2064', 'tamper\n')
+# ('3883', '949', '4957', '2064', 'tamper\n')
+# ('383', '179', '512', '276', 'tamper')
 
 def get_fname(path):
     a = os.path.basename(path)#带后缀的文件名
     return a.split('.')[0]
-# print(get_fname(r'myDLstudy\tricks_computational-performance\000001.xml')) # 000001
+# print(get_fname(r'F:\dataset\nist\Annotations\000001.xml')) # 000001
 
 
 def stream_operat():
@@ -46,9 +49,10 @@ def stream_operat():
     # path = r'F:\dataset\test'
     path = r'F:\dataset\nist\Annotations'
     # 拿文件名
-    with open(r'F:\dataset\test.txt',mode='w') as file_handle:
+    with open(r'F:\dataset\nist.txt',mode='w') as file_handle:
     # file_handle = open(r'F:\dataset\test.txt',mode='w')
         for filename in os.listdir(path):
+            filename = path + "\\" + str(filename)
             s_list = []
             strname = get_fname(filename)
             s_list.append(strname)
@@ -58,5 +62,7 @@ def stream_operat():
                 s_list.append(str4[i])
                 if i < 4:
                     s_list.append(' ')
+                # if i == 4:
+                #     s_list.append('\n')
             file_handle.writelines(s_list)
 stream_operat()
