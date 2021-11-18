@@ -1,55 +1,27 @@
+# 卷积神经网络（LeNet）
 import torch
 from torch import nn
 from d2l import torch as d2l
 from matplotlib import pyplot as plt
-
+# 调整输入格式
 class Reshape(torch.nn.Module):
     def forward(self, x):
         # -1表示批量大小不变
         return x.view(-1, 1, 28, 28)
 
-class ConvNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.layer1 = torch.nn.Sequential(
-            Reshape(), nn.Conv2d(1, 6, kernel_size=3, padding=1), nn.ReLU(),# 第一层卷积
-            nn.AvgPool2d(kernel_size=3, padding=1, stride=2), # 池化1
-            nn.Conv2d(6, 12, kernel_size=3, padding=1), nn.ReLU(),# 第二卷积层
-            nn.AvgPool2d(kernel_size=2, stride=2),
-            nn.Flatten(),# 展平
-            nn.Linear(588, 10))
-    def forward(self, x):
-        out = self.layer1(x)
-        return out
-net = ConvNet()
-print(net)
-'''
+# 网络定义
 net = torch.nn.Sequential(
-    Reshape(), nn.Conv2d(1, 6, kernel_size=3, padding=1), nn.ReLU(),# 第一层卷积
-    nn.AvgPool2d(kernel_size=3, padding=1, stride=2), # 池化1
-    nn.Conv2d(6, 12, kernel_size=3, padding=1, stride=2), nn.ReLU(),# 第二卷积层
-    nn.AvgPool2d(kernel_size=2, stride=2),
-    nn.Flatten(),# 展平
-    nn.Linear(108, 10))
-'''
+    Reshape(),
+    nn.Conv2d(1, 6, kernel_size=5, padding=2), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.Conv2d(6, 16, kernel_size=5), nn.ReLU(),
+    nn.MaxPool2d(kernel_size=2, stride=2),
+    nn.Flatten(),
+    nn.Linear(16 * 5 * 5, 120), nn.ReLU(),
+    nn.Linear(120, 84), nn.ReLU(),
+    nn.Linear(84, 10))
 
-'''
-X = torch.rand(size=(1, 1, 28, 28), dtype=torch.float32)
-for layer in net:
-    X = layer(X)
-    print(layer.__class__.__name__, 'output shape:\t', X.shape)
-
-    (0): Reshape()
-    (1): Conv2d(1, 6, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-    (2): ReLU()
-    (3): AvgPool2d(kernel_size=3, stride=2, padding=1)
-    (4): Conv2d(6, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-    (5): ReLU()
-    (6): AvgPool2d(kernel_size=2, stride=2, padding=0)
-    (7): Flatten(start_dim=1, end_dim=-1)
-    (8): Linear(in_features=588, out_features=10, bias=True)
-'''
-
+# 模型训练
 batch_size = 256
 # 用fashion_mnist来试试
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
@@ -130,6 +102,5 @@ lr, num_epochs = 0.20, 10
 train(net, train_iter, test_iter, num_epochs, lr, d2l.try_gpu())
 plt.show()
 
-# loss 0.359, train acc 0.871, test acc 0.858
-# 保存模型
-# torch.save(net.state_dict(), r'myDLstudy\DLmeet\CNN.params')
+# loss 0.279, train acc 0.895, test acc 0.871
+# torch.save(net.state_dict(), r'myDLstudy\DLmeet\LeNet.params')
